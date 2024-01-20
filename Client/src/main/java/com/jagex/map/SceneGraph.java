@@ -400,7 +400,7 @@ public class SceneGraph {
 	}
 
 	public boolean addEntity(int x, int y, int plane, Renderable renderable, int yaw, ObjectKey key, int renderHeight,
-	                         int delta, boolean accountForYaw, boolean temporary) {
+							 int delta, boolean accountForYaw, boolean temporary) {
 		if (renderable == null)
 			return true;
 
@@ -461,7 +461,7 @@ public class SceneGraph {
 	}
 
 	public void addGroundItem(int x, int y, int z, int key, Renderable primary, Renderable secondary,
-	                          Renderable tertiary, int plane) {
+							  Renderable tertiary, int plane) {
 		GroundItem item = new GroundItem();
 		item.setPrimary(primary);
 		item.setX(x * 128 + 64);
@@ -492,7 +492,7 @@ public class SceneGraph {
 	}
 
 	public ObjectKey addObject(int tileX, int tileY, int plane, int objectId, int objectType, int rotation,
-	                           boolean temporary) {
+							   boolean temporary) {
 		if (tiles[plane][tileX][tileY] == null) {
 			tiles[plane][tileX][tileY] = new SceneTile(tileX, tileY, plane);
 		}
@@ -508,7 +508,7 @@ public class SceneGraph {
 	}
 
 	public boolean addObject(int x, int y, int plane, int width, int length, Renderable renderable, ObjectKey key, int yaw,
-	                         int j, boolean temporary) {
+							 int j, boolean temporary) {
 		if (renderable == null)
 			return true;
 
@@ -519,7 +519,7 @@ public class SceneGraph {
 	}
 
 	private boolean addRenderable(int plane, int minX, int minY, int deltaX, int deltaY, int centreX, int centreY,
-	                              int renderHeight, Renderable renderable, int yaw, boolean flag, ObjectKey key, boolean temporary) {
+								  int renderHeight, Renderable renderable, int yaw, boolean flag, ObjectKey key, boolean temporary) {
 
 
 		for (int x = minX; x < minX + deltaX; x++) {
@@ -613,7 +613,7 @@ public class SceneGraph {
 	}
 
 	public boolean addRenderable(int plane, int worldY, Renderable renderable, int orientation, int i1, int j1,
-	                             int renderHeight, int minX, int i2, ObjectKey key, int minY, boolean temporary) {
+								 int renderHeight, int minX, int i2, ObjectKey key, int minY, boolean temporary) {
 		if (renderable == null)
 			return true;
 
@@ -764,7 +764,7 @@ public class SceneGraph {
 	}
 
 	public void addWall(ObjectKey key, int x, int y, int plane, int i, Renderable primary, Renderable secondary, int height,
-	                    int j1, boolean temporary) {
+						int j1, boolean temporary) {
 		if (primary == null && secondary == null)
 			return;
 
@@ -799,7 +799,7 @@ public class SceneGraph {
 	}
 
 	public void addWallDecoration(ObjectKey key, int y, int orientation, int plane, int xDisplacement, int height,
-	                              Renderable renderable, int x, int yDisplacement, int attributes, boolean temporary) {
+								  Renderable renderable, int x, int yDisplacement, int attributes, boolean temporary) {
 		if (renderable == null)
 			return;
 		WallDecoration decoration = new WallDecoration(key, (x) * 128 + 64 + xDisplacement,
@@ -2096,9 +2096,9 @@ public class SceneGraph {
 
 							},
 							(absX, absY) -> {
-							//	if(Options.brushSize.get() == 1 || absX == hoveredTileX - Options.brushSize.get() && absY == hoveredTileY - Options.brushSize.get()){
-							//		this.addTemporaryTile(plane, absX, absY, 3, 3, -1, GameRasterizer.getInstance().getFuchsia(), 62000);
-							//	}
+								//	if(Options.brushSize.get() == 1 || absX == hoveredTileX - Options.brushSize.get() && absY == hoveredTileY - Options.brushSize.get()){
+								//		this.addTemporaryTile(plane, absX, absY, 3, 3, -1, GameRasterizer.getInstance().getFuchsia(), 62000);
+								//	}
 							}, null);
 
 					if (!ctrlDown && Config.HEIGHT_SMOOTHING) {
@@ -2841,6 +2841,17 @@ public class SceneGraph {
 					}
 				}
 			}
+			if (Options.showObjectNumbers.get()) {
+				if (activeTile != null) {
+					try {
+						for (GameObject object : activeTile.gameObjects) {
+							if (object != null)
+								Client.getSingleton().robotoFont.drawString("" + object.getId(), (int) screenPos.getX(), (int) screenPos.getY(), 0xffff00);
+						}
+					} catch (Exception e) {
+					}
+				}
+			}
 			if (Options.showOverlayNumbers.get()) {
 				if (activeTile != null) {
 					try {
@@ -3338,7 +3349,7 @@ public class SceneGraph {
 	}
 
 	public void renderPlainTileNoMouse(SimpleTile tile, int plane, int ySin, int yCos, int xSin, int xCos, int tileX,
-	                                   int tileY, boolean hiddenTile, boolean highlighted, boolean tileSelected, boolean tileBeingSelected, byte flag) {
+									   int tileY, boolean hiddenTile, boolean highlighted, boolean tileSelected, boolean tileBeingSelected, byte flag) {
 		int xC;
 		int xA = xC = (tileX << 7) - xCameraTile;
 		int yB;
@@ -3499,7 +3510,7 @@ public class SceneGraph {
 	}
 
 	public void renderPlainTile(SimpleTile tile, int plane, int ySin, int yCos, int xSin, int xCos, int tileX,
-	                            int tileY, boolean hiddenTile, boolean highlighted, boolean tileSelected, boolean tileBeingSelected, byte flag) {
+								int tileY, boolean hiddenTile, boolean highlighted, boolean tileSelected, boolean tileBeingSelected, byte flag) {
 		int xC;
 		int xA = xC = (tileX << 7) - xCameraTile;
 		int yB;
@@ -3691,7 +3702,7 @@ public class SceneGraph {
 	}
 
 	public void renderShapedTile(int tileX, int ySin, int xSin, ShapedTile tile, int yCos, int tileY, int xCos,
-	                             int plane, boolean highlight, boolean tileSelected, boolean tileBeingSelected, byte flag) {
+								 int plane, boolean highlight, boolean tileSelected, boolean tileBeingSelected, byte flag) {
 
 		//Renders a tile in 2 triangle halves.
 
@@ -4551,9 +4562,9 @@ public class SceneGraph {
 					SceneTile tile = tiles[z][x][y];
 					if (tile != null) {
 						for (GameObject object : tile.gameObjects)
-							if (object != null) {
+							if (object != null && object.getId() != 0) {
 								if(object.getX() == x && object.getY() == y)
-								objs.add(object);
+									objs.add(object);
 							}
 						if (tile.groundDecoration != null) {
 							objs.add(tile.groundDecoration);
