@@ -268,25 +268,25 @@ public class MainController {
 
 	@FXML
 	private JFXCheckBox forceLowestCheck;
-	
+
 	@FXML
 	private JFXCheckBox disableRenderCheck;
 
 	@FXML
 	private JFXCheckBox drawOnLowerZCheck;
-	
+
 
 	@FXML
 	private JFXCheckBox absoluteHeightCheck;
 
 	@FXML
 	private ToggleButton setFlagBtn;
-	
-    @FXML
-    private ToggleButton paintOverlayBtn;
 
-    @FXML
-    private ToggleButton paintUnderlayBtn;
+	@FXML
+	private ToggleButton paintOverlayBtn;
+
+	@FXML
+	private ToggleButton paintUnderlayBtn;
 
 	@FXML
 	private MenuItem copyTileFlags;
@@ -329,6 +329,9 @@ public class MainController {
 	private MenuItem getUnderlayFromTile;
 
 	@FXML
+	private CheckMenuItem displayObjectIds;
+
+	@FXML
 	private CheckMenuItem displayOverlayIds;
 
 	@FXML
@@ -363,16 +366,16 @@ public class MainController {
 
 	@FXML
 	private MenuItem setRelativeHeight;
-	
+
 	@FXML
 	private MenuItem generateBridgeBtn;
-	
+
 	@FXML
 	private VBox root;
-	
 
-    @FXML
-    private Menu fileMenu, editMenu, viewMenu, tilesMenu, toolsMenu, helpMenu, debugMenu;
+
+	@FXML
+	private Menu fileMenu, editMenu, viewMenu, tilesMenu, toolsMenu, helpMenu, debugMenu;
 
 	public void initializeToolButtons() {
 		this.toolGroup.selectedToggleProperty().addListener((observable, oldVal, newVal) -> {
@@ -399,18 +402,18 @@ public class MainController {
 		ChangeListenerUtil.addListener(true, () -> {
 			Options.currentTool.set(ToolType.DELETE_OBJECT);
 		}, deleteObjectBtn.selectedProperty());
-		
+
 		ChangeListenerUtil.addListener(true, () -> {
 			Options.currentTool.set(ToolType.PAINT_OVERLAY);
 		}, paintOverlayBtn.selectedProperty());
 		ChangeListenerUtil.addListener(true, () -> {
 			Options.currentTool.set(ToolType.PAINT_UNDERLAY);
 		}, paintUnderlayBtn.selectedProperty());
-		
+
 		ChangeListenerUtil.addListener(true, () -> {
 			Options.currentTool.set(ToolType.SET_FLAGS);
 		}, setFlagBtn.selectedProperty());
-		
+
 
 	}
 
@@ -420,57 +423,57 @@ public class MainController {
 			SwatchType swatchType = SwatchType.getById(i);
 			SwatchControl swatch = new SwatchControl(swatchType);
 			switch (swatchType) {
-			case OBJECT:
-				application.setObjectSwatch(swatch);
-				break;
-			case OVERLAY:
+				case OBJECT:
+					application.setObjectSwatch(swatch);
+					break;
+				case OVERLAY:
 
-				FlowPane flowPane = new FlowPane();
-				flowPane.setPadding(new Insets(4, 4, 4, 4));
-				flowPane.setOrientation(Orientation.HORIZONTAL);
-				flowPane.setRowValignment(VPos.CENTER);
-				flowPane.setColumnHalignment(HPos.CENTER);
-				flowPane.setHgap(6);
-				flowPane.setVgap(6);
-				ToggleGroup tg = new ToggleGroup();
+					FlowPane flowPane = new FlowPane();
+					flowPane.setPadding(new Insets(4, 4, 4, 4));
+					flowPane.setOrientation(Orientation.HORIZONTAL);
+					flowPane.setRowValignment(VPos.CENTER);
+					flowPane.setColumnHalignment(HPos.CENTER);
+					flowPane.setHgap(6);
+					flowPane.setVgap(6);
+					ToggleGroup tg = new ToggleGroup();
 
-				AlwaysSelectToggleGroup.setup(tg);
-				ToggleButton[] shapeButtons = new ToggleButton[13];
-				for (int type = 0; type < 13; type++) {
-					Pane g = Testing.generateImage(type);
-					ToggleButton btn = new ToggleButton();
-					shapeButtons[type] = btn;
-					tg.getProperties().put(type, btn);
-					btn.setAlignment(Pos.CENTER);
-					btn.setMaxSize(36, 36);
-					btn.setPrefSize(36, 36);
-					btn.setMinSize(36, 36);
-					btn.setToggleGroup(tg);
-					btn.setGraphic(g);
-					btn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-					final int shapeType = type;
-					btn.setOnAction(evt -> {
+					AlwaysSelectToggleGroup.setup(tg);
+					ToggleButton[] shapeButtons = new ToggleButton[13];
+					for (int type = 0; type < 13; type++) {
+						Pane g = Testing.generateImage(type);
+						ToggleButton btn = new ToggleButton();
+						shapeButtons[type] = btn;
+						tg.getProperties().put(type, btn);
+						btn.setAlignment(Pos.CENTER);
+						btn.setMaxSize(36, 36);
+						btn.setPrefSize(36, 36);
+						btn.setMinSize(36, 36);
+						btn.setToggleGroup(tg);
+						btn.setGraphic(g);
+						btn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+						final int shapeType = type;
+						btn.setOnAction(evt -> {
 
-						Options.overlayPaintShapeId.set(shapeType);
-					});
-					flowPane.getChildren().add(btn);
-					if (type == 1) {
-						btn.setSelected(true);
+							Options.overlayPaintShapeId.set(shapeType);
+						});
+						flowPane.getChildren().add(btn);
+						if (type == 1) {
+							btn.setSelected(true);
+						}
+
 					}
+					flowPane.setAlignment(Pos.CENTER);
+					swatch.getController().getVboxContainer().setSpacing(10);
+					swatch.setOverlayShapeGroup(tg);
+					swatch.getController().getVboxContainer().getChildren().add(0, flowPane);
+					application.setOverlaySwatch(swatch);
 
-				}
-				flowPane.setAlignment(Pos.CENTER);
-				swatch.getController().getVboxContainer().setSpacing(10);
-				swatch.setOverlayShapeGroup(tg);
-				swatch.getController().getVboxContainer().getChildren().add(0, flowPane);
-				application.setOverlaySwatch(swatch);
+					//TODO Find a less aids way of doing this
 
-				//TODO Find a less aids way of doing this
-
-				break;
-			case UNDERLAY:
-				application.setUnderlaySwatch(swatch);
-				break;
+					break;
+				case UNDERLAY:
+					application.setUnderlaySwatch(swatch);
+					break;
 
 			}
 
@@ -527,6 +530,7 @@ public class MainController {
 		Options.allHeightsVisible.bindBidirectional(this.allHeightsCheckItem.selectedProperty());
 		Options.showOverlay.bindBidirectional(this.showOverlaysCheckItem.selectedProperty());
 
+		Options.showObjectNumbers.bindBidirectional(this.displayObjectIds.selectedProperty());
 		Options.showOverlayNumbers.bindBidirectional(this.displayOverlayIds.selectedProperty());
 		Options.showUnderlayNumbers.bindBidirectional(this.displayUnderlayIds.selectedProperty());
 		Options.showTileHeightNumbers.bindBidirectional(this.displayTileHeights.selectedProperty());
@@ -605,7 +609,7 @@ public class MainController {
 		this.heightLevelSlider.valueProperty()
 				.addListener((observable, oldVal, newVal) -> this.tileHeightTextBox.setText(newVal.intValue() + ""));
 		this.tileHeightTextButton.setOnAction(
-				evt -> { 
+				evt -> {
 					this.heightLevelSlider.adjustValue(Doubles.tryParse(this.tileHeightTextBox.getText()));
 					System.out.println(this.heightLevelSlider.valueProperty().get() + " : " + this.heightLevelSlider.valueProperty().intValue());
 					this.getTileHeightTextBox().textProperty().set(this.getHeightLevelSlider().valueProperty().intValue() + "");
@@ -613,7 +617,7 @@ public class MainController {
 				});
 		UnaryOperator<TextFormatter.Change> integerFilter = change -> {
 			String newText = change.getControlNewText();
-			
+
 			if (newText.matches("-?([0-9]*)?")) {
 				return change;
 			}
@@ -644,7 +648,7 @@ public class MainController {
 		Options.currentHeight.bind(currentHeightSpinner.valueProperty());
 
 		Options.simulateBridgesProperty.bindBidirectional(simulateBridges.selectedProperty());
-		
+
 		generateBridgeBtn.setOnAction(evt -> {
 			try {
 				BridgeBuilder.buildBridge();
