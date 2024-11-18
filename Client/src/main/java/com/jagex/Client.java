@@ -79,18 +79,18 @@ public final class Client implements Runnable {
 	public Font jetBrainsMono;
 
 	public SceneGraph sceneGraph;
-	
+
 	public boolean cameraMoved = true;
-	
+
 	// client
 	public static HashMap<Consumer<Client>, Long> timedConsumers = Maps.newHashMap();
-	
+
 	public static ObjectProperty<ResourceResponse> lastDeliveredResource = new SimpleObjectProperty<ResourceResponse>();
-	
+
 	private Cache cache;
-	
+
 	public static BooleanProperty gameLoaded = new SimpleBooleanProperty(false);
-	
+
 	public static ObjectProperty<Exception> lastThrownException = new SimpleObjectProperty<Exception>();
 
 	public static final int[] BIT_MASKS;
@@ -98,13 +98,13 @@ public final class Client implements Runnable {
 	public static int pulseTick;
 	static boolean displayFps;
 	static int drawTick;
-	
+
 	private static Client singleton;
-	
+
 	public static Client getSingleton() {
 		return singleton;
 	}
-	
+
 	private static boolean clientLoaded;
 	private static boolean lowMemory;
 
@@ -125,9 +125,9 @@ public final class Client implements Runnable {
 	public static int tickDelta;
 
 	public static ObjectKey hoveredUID = null;
-	
+
 	public static List<Runnable> runLater = new ArrayList<>();
-	
+
 
 	public static Client initialize(int width, int height) {
 
@@ -140,7 +140,7 @@ public final class Client implements Runnable {
 		client.initFrame(height, width);
 		return client;
 	}
-	
+
 	private ReentrantLock cacheLoadingLock = new ReentrantLock();
 	public void loadCache(Path path) {
 		cacheLoadingLock.lock();
@@ -148,9 +148,9 @@ public final class Client implements Runnable {
 			this.cache = new Cache(path);
 			Thread t = new Thread(getProvider());
 			t.start();
-	
+
 			EventBus.getDefault().register(this);
-				new MeshLoader(cache.getProvider());
+			new MeshLoader(cache.getProvider());
 		} catch (Exception e) {
 			errorMessage = "There was an error loading the specified cache!";
 			error = true;
@@ -158,7 +158,7 @@ public final class Client implements Runnable {
 		}
 		cacheLoadingLock.unlock();
 	}
-	
+
 	public Cache getCache() {
 		return cache;
 	}
@@ -179,7 +179,7 @@ public final class Client implements Runnable {
 	public static final void reset() {
 		unlinkCaches();
 
-		
+
 	}
 
 	public static void setHighMemory() {
@@ -274,11 +274,11 @@ public final class Client implements Runnable {
 		}*/
 
 	public BooleanProperty errorDisplayed = new SimpleBooleanProperty(false);
-	
+
 	public final void displayErrorMessage() {
 		errorDisplayed.set(true);
 		GraphicsContext context = gameCanvas.getGraphicsContext2D();
-	//	Graphics graphics = gameCanvas.getGraphics();
+		//	Graphics graphics = gameCanvas.getGraphics();
 		context.setFill(Color.BLACK);
 		context.clearRect(0, 0, getCanvasWidth(), canvasHeight);
 		//graphics.setColor(Color.black);
@@ -291,8 +291,8 @@ public final class Client implements Runnable {
 			context.setFill(Color.YELLOW);
 			context.setTextAlign(TextAlignment.CENTER);
 			context.setTextBaseline(VPos.CENTER);
-			
-			
+
+
 			context.fillText("An error has occured while booting the map editor", this.getCanvasWidth() / 2, this.getCanvasHeight() / 2);
 			if(!errorMessage.isEmpty()) {
 				context.fillText(errorMessage, this.getCanvasWidth() / 2, this.getCanvasHeight() / 2 + 20);
@@ -340,7 +340,7 @@ public final class Client implements Runnable {
 	public static enum LoadState {
 		CLIENT_INIT, WAITING_INPUT, LOADING_MAP, ACTIVE, ERROR
 	}
-	
+
 	public LoadState loadState = LoadState.CLIENT_INIT;
 
 	public final void drawGameScreen() {
@@ -353,21 +353,21 @@ public final class Client implements Runnable {
 
 			gameImageBuffer.initializeRasterizer();
 			gameImageBuffer.clear(0);
-			TextRenderUtils.renderCenter(gameImageBuffer.getGraphics(), 
-					"Please select a map to load...",  
+			TextRenderUtils.renderCenter(gameImageBuffer.getGraphics(),
+					"Please select a map to load...",
 					gameCanvas.getWidth() / 2, gameCanvas.getHeight() / 2 - 20,
 					0xffffff);
 			drawDebugOverlay();
 			gameImageBuffer.finalize();
 		}
-		
+
 		if (loadState == LoadState.ERROR) {
 
 			gameImageBuffer.initializeRasterizer();
 			gameImageBuffer.clear(0);
-			TextRenderUtils.renderCenter(gameImageBuffer.getGraphics(), 
+			TextRenderUtils.renderCenter(gameImageBuffer.getGraphics(),
 					"There was an error loading the specified map!", gameCanvas.getWidth() / 2, gameCanvas.getHeight() / 2 - 20, 0xFFFFFF);
-			
+
 			drawDebugOverlay();
 			gameImageBuffer.finalize();
 		}
@@ -376,8 +376,8 @@ public final class Client implements Runnable {
 			renderView();
 		}
 
-		
-		
+
+
 		drawGameImage();
 		if (loadState == LoadState.ACTIVE && SceneGraph.minimapUpdate) {
 			if(System.currentTimeMillis() - lastMinimapUpdate > 100) {
@@ -389,7 +389,7 @@ public final class Client implements Runnable {
 					chunk.drawMinimapScene(Options.currentHeight.get());
 					chunk.drawMinimap();
 					chunk.minimapImageBuffer.finalize();
-					
+
 					drawMinimapImage();
 					SceneGraph.minimapUpdate = false;
 					gameImageBufferNeedsInit = true;
@@ -403,7 +403,7 @@ public final class Client implements Runnable {
 		}
 		tickDelta = 0;
 	}
-	
+
 	private static long lastMinimapUpdate;
 
 	public Chunk getCurrentChunk() {
@@ -442,7 +442,7 @@ public final class Client implements Runnable {
 		GameRasterizer.getInstance().setBounds(0, 0, w, h);
 		GameRasterizer.getInstance().useViewport();
 		gameImageBuffer.getGraphics().setFont(jetBrainsMono);
-		
+
 		if(sceneGraph != null)
 			sceneGraph.method310(500, 800, w, h, ai);
 
@@ -455,13 +455,13 @@ public final class Client implements Runnable {
 			cacheLoadingLock.lock();
 			log.info("Cache finished loading!");
 		}
-		
+
 		if(!errorMessage.isEmpty()) {
 			clientLoaded = true;
 			return;
 		}
 		drawLoadingText(20, "Starting up");
-	
+
 		if (clientLoaded) {
 			gameAlreadyLoaded = true;
 			return;
@@ -469,8 +469,8 @@ public final class Client implements Runnable {
 
 		clientLoaded = true;
 
-	
-		
+
+
 		ClientPluginLoader.loadPlugins();
 		try {
 
@@ -536,7 +536,7 @@ public final class Client implements Runnable {
 			}
 
 			drawLoadingText(65, "Loading plugins...");
-			
+
 			ClientPluginLoader.forEach(plugin -> {
 				try {
 					plugin.onGameLoaded(this);
@@ -546,10 +546,10 @@ public final class Client implements Runnable {
 					errorMessage = "The selected plugin was unable to load";
 				}
 			});
-			
+
 			if(!errorMessage.isEmpty())
 				throw new IllegalStateException(errorMessage);
-			
+
 
 
 			log.info("Loaded {} map functions.", mapFunctions.length);
@@ -582,7 +582,7 @@ public final class Client implements Runnable {
 
 	@Getter
 	private int baseX, baseY;
-	
+
 	private Chunk lastChunk;
 
 	public final void loadCoordinates(int wX, int wY, int chunkXLength, int chunkYLength) {
@@ -591,10 +591,10 @@ public final class Client implements Runnable {
 
 		fullMapCanvas = new DisplayCanvas(chunkXLength * Options.mapRegionSize.get(), chunkYLength * Options.mapRegionSize.get(), false);
 		chunks.clear();
-		
+
 		gameImageBuffer.initializeRasterizer();
 		gameImageBuffer.clear(0);
-		TextRenderUtils.renderCenter(gameImageBuffer.getGraphics(), 
+		TextRenderUtils.renderCenter(gameImageBuffer.getGraphics(),
 				"Loading map, this may take a few seconds...", gameCanvas.getWidth() / 2, gameCanvas.getHeight() / 2 - 20, 0xFFFFFF);
 		// frameFont.renderCentre(256, 150, "Loading - please wait.", 0xffffff);
 		gameImageBuffer.finalize();
@@ -605,41 +605,39 @@ public final class Client implements Runnable {
 		mapRegion = new MapRegion(sceneGraph, 64 * (chunkXLength), 64 * (chunkYLength));
 		for (int chunkX = 0; chunkX < chunkXLength; chunkX++) {
 			for (int chunkY = 0; chunkY < chunkYLength; chunkY++) {
-			//	try {
-					anInt984 = 0;
-					int cX = (wX + (64 * chunkX)) / 64;
-					int cY = (wY + (64 * chunkY)) / 64;
-					int hash = (cX << 8) + cY;
-					Chunk chunk = new Chunk(hash);
-					chunk.offsetX = (64 * chunkX);
-					chunk.offsetY = (64 * chunkY);
+				//	try {
+				anInt984 = 0;
+				int cX = (wX + (64 * chunkX)) / 64;
+				int cY = (wY + (64 * chunkY)) / 64;
+				int hash = (cX << 8) + cY;
+				Chunk chunk = new Chunk(hash);
+				chunk.offsetX = (64 * chunkX);
+				chunk.offsetY = (64 * chunkY);
 
-					chunk.init(this);
-					/*
-					 * if (this.regionX == regionX && this.regionY == regionY && loadingStage ==
-					 * 2)//XXX return;
-					 */
+				chunk.init(this);
+				/*
+				 * if (this.regionX == regionX && this.regionY == regionY && loadingStage ==
+				 * 2)//XXX return;
+				 */
 
-					// Each -6 is -0.5 in loop, for a total of +1 loop
-					int landscapeMapId = MapIndexLoader.resolve(cX, cY, MapType.LANDSCAPE);
-					chunk.tileMapId = landscapeMapId;
-					chunk.tileMapGroup = MapIndexLoader.instance.getGroupName(chunk.regionHash,MapType.LANDSCAPE);
-					chunk.tileMapName = MapIndexLoader.getName(cX, cY, MapType.LANDSCAPE);
-					if (landscapeMapId != -1) {
-						getProvider().requestMap(landscapeMapId, hash);
-						System.out.println("Requesting landscape map " + landscapeMapId);
-					}
+				// Each -6 is -0.5 in loop, for a total of +1 loop
+				int landscapeMapId = MapIndexLoader.resolve(cX, cY, MapType.LANDSCAPE);
+				chunk.tileMapId = landscapeMapId;
+				chunk.tileMapName = MapIndexLoader.getName(cX, cY, MapType.LANDSCAPE);
+				if (landscapeMapId != -1) {
+					getProvider().requestMap(landscapeMapId, hash);
+					System.out.println("Requesting landscape map " + landscapeMapId);
+				}
 
-					int objectMapId = MapIndexLoader.resolve(cX, cY, MapType.OBJECT);
-					chunk.objectMapId = objectMapId;
-					chunk.objectMapGroup = MapIndexLoader.instance.getGroupName(chunk.regionHash,MapType.OBJECT);
-					chunk.objectMapName = MapIndexLoader.getName(cX, cY, MapType.OBJECT);
-					if (objectMapId != -1) {
-						getProvider().requestMap(objectMapId, hash);
-						System.out.println("Requesting object map " + objectMapId);
-					}
-					log.info("Added chunk, obj/landscape {}/{} [{},{}]", objectMapId, landscapeMapId, chunk.objectMapGroup, chunk.tileMapGroup);
-					pendingChunks.add(chunk);
+				int objectMapId = MapIndexLoader.resolve(cX, cY, MapType.OBJECT);
+				chunk.objectMapId = objectMapId;
+				chunk.objectMapName = MapIndexLoader.getName(cX, cY, MapType.OBJECT);
+				if (objectMapId != -1) {
+					getProvider().requestMap(objectMapId, hash);
+					System.out.println("Requesting object map " + objectMapId);
+				}
+				log.info("Added chunk, obj/landscape {}/{}", objectMapId, landscapeMapId);
+				pendingChunks.add(chunk);
 				//} catch (Exception exception) {
 				//	break;
 				//}
@@ -658,17 +656,17 @@ public final class Client implements Runnable {
 		loadState = LoadState.LOADING_MAP;
 		loadingStartTime = System.currentTimeMillis();
 	}
-	
+
 	public final void loadNew(int chunkXLength, int chunkYLength, int[][] heights) {
 
 		baseX = 0;
 		baseY = 0;
 		fullMapCanvas = new DisplayCanvas(chunkXLength * Options.mapRegionSize.get(), chunkYLength * Options.mapRegionSize.get(), false);
 		chunks.clear();
-		
+
 		gameImageBuffer.initializeRasterizer();
 		gameImageBuffer.clear(0);
-		TextRenderUtils.renderCenter(gameImageBuffer.getGraphics(), 
+		TextRenderUtils.renderCenter(gameImageBuffer.getGraphics(),
 				"Loading map, this may take a few seconds...", gameCanvas.getWidth() / 2, gameCanvas.getHeight() / 2 - 20, 0xFFFFFF);
 		// frameFont.renderCentre(256, 150, "Loading - please wait.", 0xffffff);
 		gameImageBuffer.finalize();
@@ -686,22 +684,22 @@ public final class Client implements Runnable {
 		int fileId = 0;
 		for (int chunkX = 0; chunkX < chunkXLength; chunkX++) {
 			for (int chunkY = 0; chunkY < chunkYLength; chunkY++) {
-					anInt984 = 0;
-					int cX = 1000;
-					int cY = 1000;
-					int hash = (cX << 8) + cY;
-					Chunk chunk = new Chunk(hash);
-					chunk.offsetX = 64 * chunkX;
-					chunk.offsetY = 64 * chunkY;
-					chunk.setNewMap(true);
-					
-					chunk.tileMapId = fileId++;
-					chunk.objectMapId = fileId++;
-					
-					chunk.fillNamesFromIds();
+				anInt984 = 0;
+				int cX = 1000;
+				int cY = 1000;
+				int hash = (cX << 8) + cY;
+				Chunk chunk = new Chunk(hash);
+				chunk.offsetX = 64 * chunkX;
+				chunk.offsetY = 64 * chunkY;
+				chunk.setNewMap(true);
 
-					chunk.init(this);
-					pendingChunks.add(chunk);
+				chunk.tileMapId = fileId++;
+				chunk.objectMapId = fileId++;
+
+				chunk.fillNamesFromIds();
+
+				chunk.init(this);
+				pendingChunks.add(chunk);
 			}
 		}
 		int width = (int) gameCanvas.getWidth();
@@ -717,7 +715,7 @@ public final class Client implements Runnable {
 		loadState = LoadState.LOADING_MAP;
 		loadingStartTime = System.currentTimeMillis();
 	}
-	
+
 
 	public final void loadChunks(List<Chunk> chunks) {
 		this.chunks.clear();
@@ -726,7 +724,7 @@ public final class Client implements Runnable {
 		baseY = 0;
 		gameImageBuffer.initializeRasterizer();
 		gameImageBuffer.clear(0);
-		TextRenderUtils.renderCenter(gameImageBuffer.getGraphics(), 
+		TextRenderUtils.renderCenter(gameImageBuffer.getGraphics(),
 				"Loading map, this may take a few seconds...", gameCanvas.getWidth() / 2, gameCanvas.getHeight() / 2 - 20, 0xFFFFFF);
 		// frameFont.renderCentre(256, 150, "Loading - please wait.", 0xffffff);
 		gameImageBuffer.finalize();
@@ -738,13 +736,13 @@ public final class Client implements Runnable {
 		for(Chunk chunk : chunks) {
 			int chunkX = chunk.offsetX / 64;
 			int chunkY = chunk.offsetY / 64;
-			
+
 			if(chunkX > chunkXLength)
 				chunkXLength = chunkX;
 			if(chunkY > chunkYLength)
 				chunkYLength = chunkY;
-			
-			
+
+
 		}
 		chunkXLength += 1;
 		chunkYLength += 1;
@@ -778,7 +776,7 @@ public final class Client implements Runnable {
 		baseY = 0;
 		gameImageBuffer.initializeRasterizer();
 		gameImageBuffer.clear(0);
-		TextRenderUtils.renderCenter(gameImageBuffer.getGraphics(), 
+		TextRenderUtils.renderCenter(gameImageBuffer.getGraphics(),
 				"Loading map, this may take a few seconds...", gameCanvas.getWidth() / 2, gameCanvas.getHeight() / 2 - 20, 0xFFFFFF);
 		// frameFont.renderCentre(256, 150, "Loading - please wait.", 0xffffff);
 		gameImageBuffer.finalize();
@@ -791,29 +789,29 @@ public final class Client implements Runnable {
 		fullMapCanvas = new DisplayCanvas(Options.mapRegionSize.get(), Options.mapRegionSize.get(), false);
 		for (int chunkX = 0; chunkX < 1; chunkX++) {
 			for (int chunkY = 0; chunkY < 1; chunkY++) {
-					anInt984 = 0;
-					int cX = (0 + 64 * chunkX) / 64;
-					int cY = (0 + 64 * chunkY) / 64;
+				anInt984 = 0;
+				int cX = (0 + 64 * chunkX) / 64;
+				int cY = (0 + 64 * chunkY) / 64;
 
-					int hash = (cX << 8) + cY;
-					Chunk chunk = new Chunk(hash);
-					chunk.offsetX = 64 * chunkX;
-					chunk.offsetY = 64 * chunkY;
+				int hash = (cX << 8) + cY;
+				Chunk chunk = new Chunk(hash);
+				chunk.offsetX = 64 * chunkX;
+				chunk.offsetY = 64 * chunkY;
 
-					chunk.init(this);
-					/*
-					 * if (this.regionX == regionX && this.regionY == regionY && loadingStage ==
-					 * 2)//XXX return;
-					 */
+				chunk.init(this);
+				/*
+				 * if (this.regionX == regionX && this.regionY == regionY && loadingStage ==
+				 * 2)//XXX return;
+				 */
 
-					// Each -6 is -0.5 in loop, for a total of +1 loop
-					chunk.tileMapId = 0;
-					chunk.objectMapId = 1;
-					
-					chunk.tileMapData = landscapeBytes;
-					chunk.objectMapData = objectBytes;
+				// Each -6 is -0.5 in loop, for a total of +1 loop
+				chunk.tileMapId = 0;
+				chunk.objectMapId = 1;
 
-					pendingChunks.add(chunk);
+				chunk.tileMapData = landscapeBytes;
+				chunk.objectMapData = objectBytes;
+
+				pendingChunks.add(chunk);
 			}
 		}
 		int width = (int) gameCanvas.getWidth();
@@ -831,23 +829,23 @@ public final class Client implements Runnable {
 	}
 
 	public final void loadNextRegion() {
-		try { 
-		if (loadState == LoadState.LOADING_MAP) {
-			boolean j = method54();
-			if (!j && System.currentTimeMillis() - loadingStartTime > 0x57e40) {
-				//TODO throw error
-				loadingStartTime = System.currentTimeMillis();
+		try {
+			if (loadState == LoadState.LOADING_MAP) {
+				boolean j = method54();
+				if (!j && System.currentTimeMillis() - loadingStartTime > 0x57e40) {
+					//TODO throw error
+					loadingStartTime = System.currentTimeMillis();
+				}
 			}
-		}
 		} catch(Exception ex) {
 			ex.printStackTrace();
 			this.chunks.clear();
-		
+
 			loadState = LoadState.ERROR;
-		
+
 		}
 		if (loadState == LoadState.ACTIVE && plane != anInt985) {
-			
+
 			anInt985 = plane;
 			gameImageBuffer.initializeRasterizer();
 		}
@@ -857,21 +855,21 @@ public final class Client implements Runnable {
 		loadState = LoadState.WAITING_INPUT;
 
 	}
-	
+
 	public void scrollOut() {
 		keyStatuses['s'] = 1;
 		timedConsumers.put(client -> {
 			client.keyStatuses['s'] = 0;
 		}, System.currentTimeMillis() + 120);
 	}
-	
+
 	public void scrollIn() {
 		keyStatuses['w'] = 1;
 		timedConsumers.put(client -> {
 			client.keyStatuses['w'] = 0;
 		}, System.currentTimeMillis() + 120);
 	}
-	
+
 	public final void handleKeyInputs(int speedMultiplier) {
 		try {
 			int j = 0 + anInt1278;
@@ -889,7 +887,7 @@ public final class Client implements Runnable {
 			if (anInt1015 != k) {
 				anInt1015 += (k - anInt1015) / 16;
 			}
-			
+
 
 			if (keyStatuses['w'] == 1) {
 				xCameraPos -= Constants.SINE[xCameraCurve] >> speedMultiplier;
@@ -911,7 +909,7 @@ public final class Client implements Runnable {
 				}
 
 				this.cameraMoved = true;
-			} 
+			}
 
 			if (keyStatuses['a'] == 1) {
 				xCameraPos -= Constants.SINE[xCameraCurve + 512 & 0x7ff] >> speedMultiplier;
@@ -940,7 +938,7 @@ public final class Client implements Runnable {
 				yCameraPos += Constants.COSINE[xCameraCurve] >> speedMultiplier;
 				this.cameraMoved = true;
 			}
-			
+
 			if (keyStatuses[1] == 1) {
 				cameraRotationX += (-24 - cameraRotationX) / 2;
 			} else if (keyStatuses[2] == 1) {
@@ -956,19 +954,19 @@ public final class Client implements Runnable {
 			} else {
 				cameraRotationZ /= 2;
 			}
-			
+
 			cameraYaw = cameraYaw + cameraRotationX / 2 & 0x7ff;
-			
+
 			cameraRoll += cameraRotationZ / 2;
-			
+
 			if (cameraRoll < -110) {
 				cameraRoll = -110;
 			}
 			if (cameraRoll > 383) {
 				cameraRoll = 383;
 			}
-			
-		
+
+
 			int j2 = 0 ;
 			if (j2 > 0x17f00) {
 				j2 = 0x17f00;
@@ -1118,16 +1116,16 @@ public final class Client implements Runnable {
 			chunk.processAnimableObjects();
 		}
 
-			int i = cameraRoll;
-			/*
-			 * if (anInt984 / 256 > i) { i = anInt984 / 256; }
-			 */
+		int i = cameraRoll;
+		/*
+		 * if (anInt984 / 256 > i) { i = anInt984 / 256; }
+		 */
 			/*if (aBooleanArray876[4] && anIntArray1203[4] > i) {
 				i = anIntArray1203[4];
 			}*/
-			int k = cameraYaw + anInt896 & 0x7ff;
-			method144(600 + i * 3, i, k);
-		
+		int k = cameraYaw + anInt896 & 0x7ff;
+		method144(600 + i * 3, i, k);
+
 
 		int currentPlane = method120();
 	
@@ -1138,39 +1136,39 @@ public final class Client implements Runnable {
 		int k1 = yCameraCurve;
 		int l1 = xCameraCurve;*/
 
-			Mesh.aBoolean1684 = true;
-			Mesh.mouseX = mouseEventX;
-			Mesh.mouseY = mouseEventY;
-			gameImageBuffer.initializeRasterizer();
-			GameRasterizer.getInstance().reset();
-			if (cameraMoved) {
-				if (Options.showCamera.get()) {
-					SceneGraph.minimapUpdate = true;
-				}
-				Chunk current = this.getCurrentChunk();
-				if (current != this.lastChunk) {
-					lastChunk = current;
-					SceneGraph.minimapUpdate = true;
-				}
-				cameraMoved = false;
+		Mesh.aBoolean1684 = true;
+		Mesh.mouseX = mouseEventX;
+		Mesh.mouseY = mouseEventY;
+		gameImageBuffer.initializeRasterizer();
+		GameRasterizer.getInstance().reset();
+		if (cameraMoved) {
+			if (Options.showCamera.get()) {
+				SceneGraph.minimapUpdate = true;
 			}
+			Chunk current = this.getCurrentChunk();
+			if (current != this.lastChunk) {
+				lastChunk = current;
+				SceneGraph.minimapUpdate = true;
+			}
+			cameraMoved = false;
+		}
 		Mesh.resourceCount = 0;
-			for (Chunk chunk : chunks) {
-				try {
-					sceneGraph.setChunk(chunk);
-					sceneGraph.renderScene(xCameraPos, yCameraPos, xCameraCurve, zCameraPos, currentPlane, yCameraCurve);
-					// xCameraPos, yCameraPos, xCameraCurve, zCameraPos, j, yCameraCurve
+		for (Chunk chunk : chunks) {
+			try {
+				sceneGraph.setChunk(chunk);
+				sceneGraph.renderScene(xCameraPos, yCameraPos, xCameraCurve, zCameraPos, currentPlane, yCameraCurve);
+				// xCameraPos, yCameraPos, xCameraCurve, zCameraPos, j, yCameraCurve
 
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-				// break;
+			} catch (Exception ex) {
+				ex.printStackTrace();
 			}
+			// break;
+		}
 		if(Mesh.resourceCount > 0)
 			hoveredUID = Mesh.resourceIDTag[Mesh.resourceCount - 1];
 		else
 			hoveredUID = null;
-		
+
 		for (Runnable r : Lists.newArrayList(SceneGraph.onCycleEnd)) {
 			if(r != null) {
 				try {
@@ -1190,7 +1188,7 @@ public final class Client implements Runnable {
 		yCameraCurve = k1;
 		xCameraCurve = l1;*/
 	}
-	
+
 	public void drawGameImage() {
 		gameImageBuffer.finalize();
 		WritableImage finalImg = gameImageBuffer.finalImage;
@@ -1198,28 +1196,28 @@ public final class Client implements Runnable {
 			drawImage(finalImg);
 		});
 	}
-	
+
 	public void drawImage(WritableImage finalImg) {
 		gameCanvas.drawImage(finalImg, 0, 0);
 	}
-	
+
 	public void saveMinimapImage(File file) throws Exception {
 		final Chunk chunk = this.getCurrentChunk();
 		ImageIO.write(chunk.minimapImageBuffer.getImage(), "png", file);
 	}
-	
+
 	public void saveMapFullImage(File file) throws Exception {
-		
-		
+
+
 		ImageIO.write(SwingFXUtils.fromFXImage(fullMapCanvas.trimmedSnapshot(), null), "png", file);
 	}
-	
+
 	public void drawMinimapImage() {
 		final Chunk chunk = this.getCurrentChunk();
 		chunk.minimapImageBuffer.finalize();
 		Platform.runLater(() -> {
-				mapCanvas.drawImage(chunk.minimapImageBuffer.getFXImage(), 0, 0);
-	
+			mapCanvas.drawImage(chunk.minimapImageBuffer.getFXImage(), 0, 0);
+
 		});
 	}
 	
@@ -1228,9 +1226,9 @@ public final class Client implements Runnable {
 		ImageIO.write(fullMapCanvas.getGraphics()., "png", file);
 	}
 	*/
-	
-	
-	
+
+
+
 	public SimpleBooleanProperty fullMapVisible = new SimpleBooleanProperty();
 
 	public void drawMinimapFullImage() {
@@ -1257,7 +1255,7 @@ public final class Client implements Runnable {
 						fullMapCanvas.getGraphicsContext2D().setStroke(Color.RED);
 						fullMapCanvas.getGraphicsContext2D().strokeRect(xPos, yPos, Options.mapRegionSize.get(), Options.mapRegionSize.get());
 					}
-					
+
 					if(Options.showMapFileNames.get()) {
 						fullMapCanvas.getGraphicsContext2D().setStroke(Color.BLACK);
 
@@ -1296,11 +1294,11 @@ public final class Client implements Runnable {
 	public final void loadChunks() {
 		anInt985 = -1;
 		unlinkCaches();
-		
+
 		SceneGraph.clearStates();
 		sceneGraph.reset();
 
-	
+
 		for (Chunk chunk : chunks) {
 			try {
 				chunk.loadChunk();
@@ -1314,12 +1312,12 @@ public final class Client implements Runnable {
 		for(int z = 0;z<4;z++)
 			sceneGraph.fill(z);
 		SceneGraph.activePlane = 0;
-		
+
 		//ObjectDefinition.baseModels.clear();
-		
+
 
 	}
-	
+
 	public final void method51() {
 
 		if (!aBoolean831) {
@@ -1365,19 +1363,19 @@ public final class Client implements Runnable {
 	public final void processLoadedResources(ResourceResponse response) {
 		byte[] unzipped;
 		try {
-				unzipped = GZIPUtils.unzip(response.getData());
-			
+			unzipped = GZIPUtils.unzip(response.getData());
+
 			if(unzipped == null) {
 				unzipped = response.getData();
 			}
-			
+
 			CacheFileType type = response.getRequest().getType();
 			int file = response.getRequest().getFile();
-			
+
 			//System.out.println("UNZIPPED " + type + ":" + file + " ATTEMPTING TO DELIVER");
 			lastDeliveredResource.set(response);
 			ClientPluginLoader.forEach(plugin -> plugin.onResourceDelivered(response));
-			
+
 			if (type == CacheFileType.ANIMATION) {//TODO Fix animations
 				if(Options.loadAnimations.get())
 					try {
@@ -1410,9 +1408,9 @@ public final class Client implements Runnable {
 			runLater.clear();
 
 		}
-		
+
 	}
-	
+
 	private List<Chunk> pendingChunks = Lists.newArrayList();
 
 	public Vector2 getScreenPos(int worldX, int worldY, int height){
@@ -1495,8 +1493,8 @@ public final class Client implements Runnable {
 		for (Chunk chunk : chunks) {
 			chunk.method115();
 		}
-		
-	
+
+
 
 		tickDelta++;
 		if (anInt917 != 0) {
@@ -1506,10 +1504,10 @@ public final class Client implements Runnable {
 			}
 		}
 
-		
-	
-		
-	
+
+
+
+
 		for (Entry<Consumer<Client>, Long> entry : Lists.newArrayList(timedConsumers.entrySet())) {
 			if(System.currentTimeMillis() >= entry.getValue()) {
 				if(entry.getKey() != null) {
@@ -1522,7 +1520,7 @@ public final class Client implements Runnable {
 		if (timeoutCounter > 3000) {
 			//
 
-			
+
 			timeoutCounter = 0;
 		}
 	}
@@ -1574,17 +1572,17 @@ public final class Client implements Runnable {
 
 	public static void updateChunkTiles() {
 		SceneGraph.onCycleEnd.add(()-> {
-				for(Chunk chunk : Client.getSingleton().chunks) {
-					chunk.updated = true;
-				}
-				Client.getSingleton().sceneGraph.tileQueue.clear();
-				Client.getSingleton().mapRegion.updateTiles();
+			for(Chunk chunk : Client.getSingleton().chunks) {
+				chunk.updated = true;
+			}
+			Client.getSingleton().sceneGraph.tileQueue.clear();
+			Client.getSingleton().mapRegion.updateTiles();
 
-				SceneGraph.minimapUpdate = true;
-				System.out.println("UPDATED TILES");
+			SceneGraph.minimapUpdate = true;
+			System.out.println("UPDATED TILES");
 		});
 	}
-	
+
 	public DisplayCanvas gameCanvas;
 	public boolean debug = false;
 	public int fps;
@@ -1646,7 +1644,7 @@ public final class Client implements Runnable {
 		graphics.setFont(jetBrainsMono);
 		graphics.setColor(java.awt.Color.white);
 		graphics.drawString(string, (canvasWidth - font.stringWidth(string)) / 2, y + 22);
-		
+
 		gameImageBuffer.finalize();
 		drawGameImage();
 	}
@@ -1654,7 +1652,7 @@ public final class Client implements Runnable {
 	public final void exit() {
 		state = -2;
 		shutdown();
-		
+
 	}
 
 	public int getCanvasHeight() {
@@ -1767,7 +1765,7 @@ public final class Client implements Runnable {
 		if (loadState == LoadState.ACTIVE) {
 			int speedMultiplier = KeyboardState.isKeyPressed(KeyCode.SHIFT) ? 10 : KeyboardState.isKeyPressed(KeyCode.CONTROL) ? 12 : 11;
 			handleKeyInputs(speedMultiplier);
-			
+
 
 		}
 		try {
@@ -1868,13 +1866,13 @@ public final class Client implements Runnable {
 			}
 
 			//for (; cycle < 256; cycle += ratio) {
-				lastMetaModifier = metaModifierPressed;
-				lastClickX = pressedX;
-				lastClickY = pressedY;
-				lastMouseClick = mouseClickTime;
-				metaModifierPressed = 0;
-				pulse();
-				lastProcessedKey = unprocessedKeyCount;
+			lastMetaModifier = metaModifierPressed;
+			lastClickX = pressedX;
+			lastClickY = pressedY;
+			lastMouseClick = mouseClickTime;
+			metaModifierPressed = 0;
+			pulse();
+			lastProcessedKey = unprocessedKeyCount;
 			//}
 
 			cycle &= 0xff;
